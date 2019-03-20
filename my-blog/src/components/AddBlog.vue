@@ -4,12 +4,12 @@
       <van-nav-bar
         title="写文章"
         left-text="返回"
-        right-text="保存"
+        :right-text= "save"
         left-arrow
         @click-right="onClickRight"
       />
     </header>
-    <div id="new-blog">
+    <div id="new-blog" v-if="!isShow">
       <form>
         <label>文章标题：</label>
         <van-cell-group>
@@ -41,20 +41,19 @@
           <option v-for="author in authors">{{author}}</option>
         </select>
       </form>
-
-      <!-- <div>
+      <van-loading v-if="isLoading" type="spinner" />
+    </div>
+    <div class="overview" v-if="isShow">
         <h3>博客总览</h3>
         <p>博客标题：{{blog.title}}</p>
         <p>博客内容：{{blog.content}}</p>
         <p>博客类别：{{blog.radio}}</p>
         <p>博客作者：{{blog.author}}</p>
-      </div> -->
-    </div>
+      </div>
   </div>
 </template>
 
 <script>
-
 export default {
   name: 'AddBlog',
   data () {
@@ -65,8 +64,10 @@ export default {
         radio: '1',
         author: ""
       },
-      authors:['tom','jerry']
-      
+      save:"保存",
+      authors:['tom','jerry'],
+      isLoading: false,
+      isShow: false
     }
   },
   created(){
@@ -74,7 +75,35 @@ export default {
   },
   methods:{
     onClickRight: function(){
-
+      this.isLoading = true;
+      let that = this;
+      this.$http.post('http://jsonplaceholder.typicode.com/posts', {
+        title: this.blog.title,
+        userId: this.blog.author,
+        body: this.blog.content
+      })
+      .then(function (response) {
+        // console.log(response);
+        
+        that.$toast({
+          message: "保存成功",
+        })
+        that.isLoading = false;
+        that.isShow = true;
+        that.save = ""
+        if(that.blog.title || this.blog.content === ""){
+          return;
+        }
+      })
+      .catch(function (error) {
+        // console.log(error);
+        that.$toast({
+          message: "保存失败",
+        })
+        that.isLoading = false;
+        that.isShow = false;
+        that.save = "保存"
+      });
     }
   }
 }
@@ -83,6 +112,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   #new-blog{
+    margin: 0 20px
+  }
+  .overview{
     margin: 0 20px
   }
   .van-cell-group {
@@ -108,6 +140,12 @@ export default {
     text-align-last: center;
     font-size: 22px
   }
-
+  .van-loading{
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    margin-left:-15px; 
+    margin-top:-15px;
+  }
 
 </style>
