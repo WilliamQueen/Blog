@@ -1,8 +1,8 @@
 <template>
-  <div class="add-blog">
+  <div class="add-blog" v-set="'width'">
     <header>
       <van-nav-bar
-        title="写文章"
+        :title="header"
         left-text="返回"
         :right-text= "save"
         left-arrow
@@ -44,7 +44,6 @@
       <van-loading v-if="isLoading" type="spinner" />
     </div>
     <div class="overview" v-if="isShow">
-        <h3>博客总览</h3>
         <p>博客标题：{{blog.title}}</p>
         <p>博客内容：{{blog.content}}</p>
         <p>博客类别：{{blog.radio}}</p>
@@ -65,6 +64,7 @@ export default {
         author: ""
       },
       save:"保存",
+      header: "写文章",
       authors:['tom','jerry'],
       isLoading: false,
       isShow: false
@@ -90,7 +90,8 @@ export default {
         })
         that.isLoading = false;
         that.isShow = true;
-        that.save = ""
+        that.save = "";
+        that.header = "文章总览"
         if(that.blog.title || this.blog.content === ""){
           return;
         }
@@ -102,7 +103,8 @@ export default {
         })
         that.isLoading = false;
         that.isShow = false;
-        that.save = "保存"
+        that.save = "保存";
+        that.header = "写文章"
       });
     }
   }
@@ -111,6 +113,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  .add-blog{
+    margin: 20px auto;
+  }
   #new-blog{
     margin: 0 20px
   }

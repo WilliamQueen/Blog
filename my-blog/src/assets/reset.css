@@ -14,7 +14,7 @@ time, mark, audio, video, input {
     margin: 0;
     padding: 0;
     border: 0;
-    font-size: 100%;
+    /* font-size: 100%; */
     font-weight: normal;
     vertical-align: baseline;
 }
@@ -27,7 +27,7 @@ footer, header, menu, nav, section {
 
 html,body {
     height: 100%;
-    background: linear-gradient(#FFF, #eee);
+    /* background: linear-gradient(#FFF, #eee); */
 }
 
 blockquote, q {
