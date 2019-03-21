@@ -1,14 +1,5 @@
 <template>
   <div class="add-blog" v-set="'width'">
-    <header>
-      <van-nav-bar
-        :title="header"
-        left-text="返回"
-        :right-text= "save"
-        left-arrow
-        @click-right="onClickRight"
-      />
-    </header>
     <div id="new-blog" v-if="!isShow">
       <form>
         <label>文章标题：</label>
@@ -31,15 +22,16 @@
         <label>文章类别：</label>
         <div class="radio">
           <van-radio-group v-model="blog.radio">
-            <van-radio name="1">HTML</van-radio>
-            <van-radio name="2">CSS</van-radio>
-            <van-radio name="3">JS</van-radio>
+            <van-radio name="HTML">HTML</van-radio>
+            <van-radio name="CSS">CSS</van-radio>
+            <van-radio name="JS">JS</van-radio>
           </van-radio-group>
         </div>
         <label>作者名称：</label>
         <select v-model="blog.author">
-          <option v-for="author in authors">{{author}}</option>
+          <option v-for="author in authors" :key="author">{{author}}</option>
         </select>
+        <button @click.prevent="onClickRight">添加博客</button>
       </form>
       <van-loading v-if="isLoading" type="spinner" />
     </div>
@@ -58,9 +50,9 @@ export default {
   data () {
     return {
       blog:{
-        title:"",
-        content:"",
-        radio: '1',
+        title:null,
+        content:null,
+        radio: 'HTML',
         author: ""
       },
       save:"保存",
@@ -77,14 +69,9 @@ export default {
     onClickRight: function(){
       this.isLoading = true;
       let that = this;
-      this.$http.post('http://jsonplaceholder.typicode.com/posts', {
-        title: this.blog.title,
-        userId: this.blog.author,
-        body: this.blog.content
-      })
+      this.$http.post('https://wd8966871714brtqrh.wilddogio.com/posts.json' , that.blog)
       .then(function (response) {
         // console.log(response);
-        
         that.$toast({
           message: "保存成功",
         })
@@ -92,12 +79,19 @@ export default {
         that.isShow = true;
         that.save = "";
         that.header = "文章总览"
-        if(that.blog.title || this.blog.content === ""){
+        if(that.blog.title === null || that.blog.content === null){
+          that.$toast({
+            message: "保存失败",
+          })
+          that.isLoading = false;
+          that.isShow = false;
+          that.save = "保存";
+          that.header = "写文章"
           return;
         }
       })
       .catch(function (error) {
-        // console.log(error);
+        console.log(error);
         that.$toast({
           message: "保存失败",
         })
@@ -144,6 +138,16 @@ export default {
     text-align: center;
     text-align-last: center;
     font-size: 22px
+  }
+  button{
+    padding: 10px 16px;
+    background: red;
+    border: none;
+    color: #fff;
+    border-radius: 5px;
+    display: block;
+    margin: 20px auto
+
   }
   .van-loading{
     position:absolute;

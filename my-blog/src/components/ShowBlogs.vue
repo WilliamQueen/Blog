@@ -5,13 +5,12 @@
     <div 
         class="blog-item"
         v-for="blog in filterBlogs"
+        :key="blog.id"
     >
         <router-link :to = "'/blog/'+blog.id">
             <h2 v-color>{{blog.title}}</h2>
         </router-link>
-        
-            
-        <article>{{blog.body | length}}</article>
+        <article>{{blog.content | length}}</article>
     </div>
   </div>
 </template>
@@ -27,11 +26,22 @@ export default {
   },
   created(){
       var that = this;
-      this.$http.get("http://jsonplaceholder.typicode.com/posts")
+      this.$http.get("https://wd8966871714brtqrh.wilddogio.com/posts.json")
       .then(function(data){
         //   console.log(data.data)
-        that.blogs = data.data.slice(0,10)
-        console.log(that.blogs)
+          return data.data
+        // that.blogs = data.data.slice(0,10)
+        // console.log(that.blogs)
+      })
+      .then(function(res){
+          let blogArr = [];
+          for(let key in res){
+            //   console.log(key)
+            res[key].id = key
+            blogArr.push(res[key])
+            that.blogs = blogArr
+          }
+          
       })
   },
   computed: {
