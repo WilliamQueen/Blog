@@ -1,6 +1,6 @@
 <template>
   <div id="show-blogs" v-set="'width'">
-    <h1>博客总览</h1>
+    <h1>全部博客</h1>
     <van-search placeholder="请输入搜索关键词" v-model="search" />
     <div 
         class="blog-item"
@@ -25,23 +25,15 @@ export default {
       }
   },
   created(){
-      var that = this;
       this.$http.get("https://wd8966871714brtqrh.wilddogio.com/posts.json")
-      .then(function(data){
-        //   console.log(data.data)
-          return data.data
-        // that.blogs = data.data.slice(0,10)
-        // console.log(that.blogs)
-      })
-      .then(function(res){
+      .then((data) => {
           let blogArr = [];
-          for(let key in res){
+          for(let key in data.data){
             //   console.log(key)
-            res[key].id = key
-            blogArr.push(res[key])
-            that.blogs = blogArr
+            data.data[key].id = key
+            blogArr.push(data.data[key])
+            this.blogs = blogArr
           }
-          
       })
   },
   computed: {

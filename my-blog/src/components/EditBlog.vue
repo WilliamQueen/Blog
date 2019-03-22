@@ -1,6 +1,7 @@
 <template>
   <div class="add-blog" v-set="'width'">
     <div id="new-blog" v-if="!isShow">
+        <h1>编辑博客</h1>
       <form>
         <label>文章标题：</label>
         <van-cell-group>
@@ -9,7 +10,6 @@
             placeholder="请输入文章标题" 
           />
         </van-cell-group>
-
         <label>编辑文章：</label>
         <van-cell-group>
           <van-field 
@@ -31,11 +31,12 @@
         <select v-model="blog.author">
           <option v-for="author in authors" :key="author">{{author}}</option>
         </select>
-        <button @click.prevent="onClickRight">添加博客</button>
+        <button @click.prevent="onClickRight">保存编辑</button>
       </form>
       <van-loading v-if="isLoading" type="spinner" />
     </div>
     <div class="overview" v-if="isShow">
+        <h1>编辑博客预览</h1>
         <p>博客标题：{{blog.title}}</p>
         <p>博客内容：<span v-html="text"> {{text}} </span> </p>
         <p>博客类别：{{blog.radio}}</p>
@@ -49,21 +50,20 @@ export default {
   name: 'AddBlog',
   data () {
     return {
-      blog:{
-        title:null,
-        content:null,
-        radio: 'HTML',
-        author: ""
-      },
-      save:"保存",
-      header: "写文章",
-      authors:['tom','jerry'],
-      isLoading: false,
-      isShow: false
+        text: '',
+        id: this.$route.params.id,
+        blog:{},
+        save:"保存",
+        header: "写文章",
+        authors:['tom','jerry'],
+        isLoading: false,
+        isShow: false
     }
   },
   created(){
-    this.blog.author = this.authors[0]
+    this.blog.author = this.authors[0];
+    this.fetchData();
+    
   },
   methods:{
     replace(){
@@ -74,41 +74,47 @@ export default {
             this.text = text
         }
     },
+    fetchData(){
+        this.$http.get('https://wd8966871714brtqrh.wilddogio.com/posts/' + this.id + '.json')
+        .then((data) => {
+            console.log(data)
+            this.blog = data.data
+        })
+    },
     onClickRight: function(){
       this.replace()
       this.isLoading = true;
       let that = this;
-      this.$http.post('https://wd8966871714brtqrh.wilddogio.com/posts.json' , that.blog)
-      .then(function (response) {
+      this.$http.put('https://wd8966871714brtqrh.wilddogio.com/posts/' + this.id + '.json' , that.blog)
+      .then( (response) => {
         // console.log(response);
-        that.$toast({
+        this.$toast({
           message: "保存成功",
         })
-        that.isLoading = false;
-        that.isShow = true;
-        that.save = "";
-        that.header = "文章总览"
-        if(that.blog.title === null || that.blog.content === null){
-          that.$toast({
+        this.isLoading = false;
+        this.isShow = true;
+        this.save = "";
+        this.header = "文章总览"
+        if(this.blog.title === null || this.blog.content === null){
+          this.$toast({
             message: "保存失败",
           })
-          that.isLoading = false;
-          that.isShow = false;
-          that.save = "保存";
-          that.header = "写文章"
+          this.isLoading = false;
+          this.isShow = false;
+          this.save = "保存";
+          this.header = "写文章"
           return;
         }
-        that.blog.title = that.blog.title.toUpperCase()
       })
       .catch(function (error) {
         console.log(error);
-        that.$toast({
+        this.$toast({
           message: "保存失败",
         })
-        that.isLoading = false;
-        that.isShow = false;
-        that.save = "保存";
-        that.header = "写文章"
+        this.isLoading = false;
+        this.isShow = false;
+        this.save = "保存";
+        this.header = "写文章"
       });
     }
   }

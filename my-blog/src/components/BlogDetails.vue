@@ -2,14 +2,16 @@
     <div id="blog-details" v-set="'width'">
         <div class="content">
             <h1>{{blog.title}}</h1>
-            <article>{{blog.content}}</article>
+            <article v-html="text">{{text}}</article>
             <div class="info">
-                <p class="author">作者：{{blog.author}}</p>
-                <p class="radio">分类：{{blog.radio}}</p>
+                <p>作者：{{blog.author}}</p>
+                <p>分类：{{blog.radio}}</p>
             </div>
-            
+            <div class="handle">
+                <router-link class="button edit" :to="'/edit/' + id" >编辑</router-link>
+                <button class="button delete" @click="toDeleteBlog()"> 删除 </button>
+            </div>
         </div>
-        
     </div>
 </template>
 
@@ -19,22 +21,35 @@ export default {
     data(){
         return {
             id: this.$route.params.id,
-            blog: {}
+            blog: {},
+            text: ''
         }
     },
     created(){
-        var that = this
+        
         this.$http.get('https://wd8966871714brtqrh.wilddogio.com/posts/' + this.id + '.json')
-        .then(function(data){
+        .then((data) => {
             // console.log(data)
-            return data.data
-            // that.blog = data.data
-            // console.log(that.blog)
+            this.blog = data.data
+            this.replace()
         })
-        .then(function(res){
-            console.log(res)
-            that.blog = res
-        })
+        
+    },
+    methods: {
+        replace(){
+            var text = this.blog.content;
+            for(var i=0 ; i<text.length ; i++){
+                text= text.replace(/\r\n/g,"<br/>");
+                text= text.replace(/\n/g,"<br/>");
+                this.text = text
+            }
+        },
+        toDeleteBlog(){
+            this.$http.delete('https://wd8966871714brtqrh.wilddogio.com/posts/' + this.id + '.json')
+            .then((data) => {
+                this.$router.push({path:'/'})
+            })
+        }
     }
 
 }
@@ -65,5 +80,25 @@ export default {
         font-size: 12px;
         margin-right: 8%
     }
-    
+    .handle{
+        display: flex;
+        justify-content: flex-end;
+    }
+    .button{
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        line-height: 50px;
+        margin-left: 20px
+    }
+    .edit{
+        text-decoration: none;
+        color: #000
+    }
+    .delete{
+        border: none;
+        background: #eee;
+        color: red;
+        cursor: pointer;
+    }
 </style>
